@@ -15,7 +15,7 @@ class SistemaOperar:
         self.RAM = simpy.Container(env, init=30, capacity=30)
         self.monitoreo = env.process(self.monitor_memory(env))
 
-    def monitor_memory(self,env):
+    def monitor_memory(self, env):
         while True:
             print "---.--- monitor_memory"
             if self.RAM.level <= 0:
@@ -50,27 +50,29 @@ def proceso(name, env, SistemaO, memoria, instrucciones, veces):
                 print('Las instrucciones que quedan son %s de %s' % (instrucciones,name)) #borrar
                 yield env.timeout(5)
                 #waiting o ready again
-                if instrucciones>0: #el waiting lo hace si aun quedan instrucciones
+                if instrucciones>0: #lo hace si aun quedan instrucciones
                     waiting = random.randint(1,2)
-                    if waiting == 1:
+                    if waiting == 1: #waiting
                         yield env.timeout(7) #hacemos un delay de 7 unidades
                         print "Hice un delay de 7"
                         env.process(proceso(name, env, SistemaO, memoria, instrucciones, veces))
-                    if waiting == 2:
+                        print "otra vez en cola... %s pero con delay" % name
+                    if waiting == 2: #ready again
                         print "otra vez en cola... %s" % name
                         env.process(proceso(name, env, SistemaO, memoria, instrucciones, veces))
-                else: #Prueba de que si ya no hay instrucciones
+                else: #Prueba de que si ya no hay instrucciones/terminated
+                    print ''
                     print "------Ya no hay instrucciones %s" % (env.now)
                     yield SistemaO.RAM.put(memoria)
-                    print('DONE procesos %s en %s ' % (name,env.now)) #terminated
+                    print('DONE procesos %s en %s ' % (name, env.now)) #terminated
 
-def setmemoria(env, name, memoria): #se asigna memoria a proceso
+def setmemoria(env, name, memoria):
     print " "
     print('El proceso %s acaba de entrar al sistema en %s' % (name, env.now))
     print ""
     print 'El nivel de memoria es %s' % SistemaO.RAM.level
     with SistemaO.RAMdisponibles.request() as req:
-        if SistemaO.RAM.level <= 0: #si el sistema ya no tiene memoria, el proceso espera
+        if SistemaO.RAM.level <= 0:
             yield req
             
         print('Proceso %s tiene %s de memoria en %s' % (name,memoria,env.now))
@@ -78,19 +80,20 @@ def setmemoria(env, name, memoria): #se asigna memoria a proceso
 
 def generadorProcesos(env, SistemaO, cantprocesos, intervalo, veces): #new process
     global instrucciones
+    tiempogenerar = random.expovariate(1.0/intervalo)
     for i in range(cantprocesos):
         memoria = random.randint(1,10) #cant de memoria a usar
         instrucciones = random.randint(1,10) #cant de instrucciones a procesar
         env.process(setmemoria(env,i,memoria))
         env.process(proceso(i, env, SistemaO, memoria, instrucciones, veces))
-        yield env.timeout(2)
+        yield env.timeout(tiempogenerar)
 
 env = simpy.Environment() #se crea ambiente
 SistemaO = SistemaOperar(env) #instancia objeto de sistema operativo 
 RANDOM_SEED = 42
 random.seed(RANDOM_SEED)
-veces = 3 #numero de instrucciones que el procesador procesa por unidad de timpo
+veces = 3
 intervalo = 10 #intervalo al que se realizara random de memoria
-cantprocesos = 4 #cantidad de procesos a realizar SO
+cantprocesos = 10 #cantidad de procesos a realizar SO
 genProcesos = env.process(generadorProcesos(env, SistemaO, cantprocesos, intervalo, veces)) #generan procesos
-env.run(40)
+env.run(100)
