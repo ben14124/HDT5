@@ -53,6 +53,8 @@ def proceso(name, env, SistemaO, memoria, instrucciones):
                         yield env.timeout(7) #hacemos un delay de 7 unidades
                         print "Hice un delay de 7"
                         env.process(proceso(name, env, SistemaO, memoria, instrucciones))
+                    if waiting == 2:
+                        env.process(proceso(name, env, SistemaO, memoria, instrucciones))
                 else: #Prueba de que si ya no hay instrucciones
                     print "------Ya no hay instrucciones %s" % (env.now)
                     yield SistemaO.RAM.put(memoria)
