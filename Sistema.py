@@ -18,12 +18,13 @@ class SistemaOperar:
     def monitor_memory(self, env):
         while True:
             if self.RAM.level <= 0:
-                print ""
+                print "No hay suficiente memoria. Se debe de esperar"
             yield env.timeout(5)
 
 def procesando(env, name, instrucciones, veces): #running - arreglar logica
     contador = veces
-    totalinstrucciones = instrucciones 
+    totalinstrucciones = instrucciones
+    print "Se estan procesando instrucciones del proceso %s" % name
     while contador < veces: #se realizan solo "veces" instrucciones por vez
         if totalinstrucciones > 0:
             contador = contador + 1
@@ -37,8 +38,7 @@ def procesando(env, name, instrucciones, veces): #running - arreglar logica
 def proceso(name, env, SistemaO, memoria, instrucciones, veces, llegatoria):
     llegada = llegatoria
     global TiempoTotal
-        #agregar while
-        #cola de ready
+        #ready
     if instrucciones>0:
         with SistemaO.InstruccionesDisponibles.request() as req:
             yield req
@@ -50,21 +50,24 @@ def proceso(name, env, SistemaO, memoria, instrucciones, veces, llegatoria):
                 if instrucciones>0: #lo hace si aun quedan instrucciones
                     waiting = random.randint(1,2)
                     if waiting == 1: #waiting
+                        print "El proceso %s se encuentra reaizando operaciones de I/O " % name
                         yield env.timeout(7) #hacemos un delay de 7 unidades
                         env.process(proceso(name, env, SistemaO, memoria, instrucciones, veces, llegada))
                     if waiting == 2: #ready again
+                        print "El proceso #%s se encuentra esperando a ser atendido de nuevo" % name
                         env.process(proceso(name, env, SistemaO, memoria, instrucciones, veces, llegada))
                 else: #Prueba de que si ya no hay instrucciones/terminated
                     yield SistemaO.RAM.put(memoria)
                     #terminated
                     totalProcesos = env.now - llegada #Tiempo que se tarda el proceso en el sistema
-                    print "El proceso #%s se tardo %s \n" % (name, totalProcesos)
+                    print "El proceso #%s salio del sistema.\nEste se tardo %s \n" % (name, totalProcesos)
                     TiempoTotal = TiempoTotal + totalProcesos #Tiempo total de todos los procesos
 
 def setmemoria(env, name, memoria):
     global totalProcesos
     #global llegada
     #llegada = env.now #Se registra el tiempo en el que el proeceso llego al sistema
+    print "El proceso #%s llega a recibir memoria\n" % name
     with SistemaO.RAMdisponibles.request() as req:
         if SistemaO.RAM.level <= 0:
             yield req
@@ -81,6 +84,7 @@ def generadorProcesos(env, SistemaO, cantprocesos, intervalo, veces): #new proce
         instrucciones = random.randint(1,10) #cant de instrucciones a procesar
         env.process(setmemoria(env,i,memoria))
         llegada = env.now
+        print "\nEl proceso #%s acaba de entrar al sistema" % i
         env.process(proceso(i, env, SistemaO, memoria, instrucciones, veces, llegada))
         yield env.timeout(tiempogenerar)
 
