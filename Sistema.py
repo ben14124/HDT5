@@ -27,7 +27,7 @@ def procesando(env, name, instrucciones): #running - arreglar logica
     totalinstrucciones = instrucciones 
     while contador < 3: #se realizan solo 3 instrucciones por vez
         if instrucciones > 0:
-            print('Se estan procesando instrucciones del proceso %s' % name)
+            print('Se estan procesando %s instrucciones del proceso %s' % (instrucciones, name))
             contador = contador + 1
             totalintrucciones = totalinstrucciones - 1
         else:
@@ -44,9 +44,9 @@ def proceso(name, env, SistemaO, memoria, instrucciones):
                 print('Las instrucciones que hay son: %s' % instrucciones)
                 env.process(procesando(env, name, instrucciones))
                 instrucciones = instrucciones - 3
-                print('Las instrucciones que quedan son %s' % instrucciones) #deberia de aparecer la actualizada pero no se como :D
+                print('Las instrucciones que quedan son %s' % instrucciones) #borrar
                 yield env.timeout(5)
-                #agregar waiting
+                #waiting o ready again
                 if instrucciones>0: #el waiting lo hace si aun quedan instrucciones
                     waiting = random.randint(1,2)
                     if waiting == 1:
@@ -54,6 +54,7 @@ def proceso(name, env, SistemaO, memoria, instrucciones):
                         print "Hice un delay de 7"
                         env.process(proceso(name, env, SistemaO, memoria, instrucciones))
                     if waiting == 2:
+                        print "otra vez en cola... %s" % name
                         env.process(proceso(name, env, SistemaO, memoria, instrucciones))
                 else: #Prueba de que si ya no hay instrucciones
                     print "------Ya no hay instrucciones %s" % (env.now)
