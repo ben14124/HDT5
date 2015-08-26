@@ -25,9 +25,7 @@ def procesando(env, name, instrucciones, veces): #running
             yield env.timeout(5)
         yield env.timeout(5)
         
-                
-            #yield env.timeout(5)
-
+        
 def setmemoria(env, name, memoria):
     global totalProcesos
     print "El proceso #%s llega a recibir memoria\n" % name
@@ -76,7 +74,6 @@ def proceso(name, env, memoria, instrucciones, veces, llegatoria):
                     #terminated
                     totalProcesos = env.now - llegada #Tiempo que se tarda el proceso en el sistema
                     Valores.append(totalProcesos)
-                    print "\n | \n"
                     print "El proceso #%s salio del sistema.\nEste se tardo %s \n" % (name, totalProcesos)
                     TiempoTotal = TiempoTotal + totalProcesos #Tiempo total de todos los procesos
                     yield RAM.put(memoria) #Regresamos la memoria utilizada
@@ -93,21 +90,20 @@ RANDOM_SEED = 42
 random.seed(RANDOM_SEED)
 veces = 3
 TiempoTotal = 0.0
-intervalo = 10 #intervalo al que se realizara random de memoria
-cantprocesos = 20 #cantidad de procesos a realizar SO
+intervalo = 5 #intervalo al que se realizara random de memoria
+cantprocesos = 200 #cantidad de procesos a realizar SO
 genProcesos = env.process(generadorProcesos(env, cantprocesos, intervalo, veces)) #generan procesos
 env.run()
+
 promedio = TiempoTotal/cantprocesos
 desvesta = 0
 ValorCuadrado = 0
 ValoresCuadrados = 0
 AdentroRaiz = 0
-cant = len(Valores)
-print cant
+
 print "Tiempo Total: %s, cantidad de procesos: %s" % (TiempoTotal, cantprocesos)
 print "El tiempo promedio del programa es de %s" % (promedio)
 for x in range (cantprocesos):
-    print Valores[x]
     ValorCuadrado = Valores[x] * Valores[x]
     ValoresCuadrados = ValoresCuadrados + ValorCuadrado
     AdentroRaiz = ValoresCuadrados/cantprocesos
