@@ -19,7 +19,7 @@ class SistemaOperar:
         while True:
             print "---.--- monitor_memory"
             if self.RAM.level <= 0:
-                print('El proceso %s al llegar en %s esta esperando...' % (env.now)) #aqui se aplica el waiting
+                print('El proceso al llegar en %s esta esperando...' % (env.now)) #aqui se aplica el waiting
             yield env.timeout(5)
 
 def procesando(env, name, instrucciones, veces): #running - arreglar logica
