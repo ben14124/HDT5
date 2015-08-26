@@ -21,7 +21,7 @@ class SistemaOperar:
                 print "No hay suficiente memoria. Se debe de esperar"
             yield env.timeout(5)
 
-def procesando(env, name, instrucciones, veces): #running - arreglar logica
+def procesando(env, name, instrucciones, veces): #running
     contador = veces
     totalinstrucciones = instrucciones
     print "Se estan procesando instrucciones del proceso %s" % name
