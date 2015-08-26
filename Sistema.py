@@ -10,6 +10,7 @@ from random import randint
 import random
 import matplotlib.pyplot as plt
 
+
 def procesando(env, name, instrucciones, veces): #running
     contador = veces
     totalinstrucciones = instrucciones
@@ -38,8 +39,8 @@ def setmemoria(env, name, memoria):
 
 def generadorProcesos(env, cantprocesos, intervalo, veces): #new process
     global instrucciones
-    tiempogenerar = random.expovariate(1.0/intervalo)
     for i in range(cantprocesos+1):
+        tiempogenerar = random.expovariate(1.0/intervalo)
         memoria = random.randint(1,10) #cant de memoria a usar
         instrucciones = random.randint(1,10) #cant de instrucciones a procesar
         env.process(setmemoria(env,i,memoria))
@@ -93,7 +94,7 @@ random.seed(RANDOM_SEED)
 veces = 3
 TiempoTotal = 0.0
 intervalo = 10 #intervalo al que se realizara random de memoria
-cantprocesos = 30 #cantidad de procesos a realizar SO
+cantprocesos = 20 #cantidad de procesos a realizar SO
 genProcesos = env.process(generadorProcesos(env, cantprocesos, intervalo, veces)) #generan procesos
 env.run()
 promedio = TiempoTotal/cantprocesos
@@ -114,5 +115,8 @@ for x in range (cantprocesos):
 desvesta = AdentroRaiz**0.5
 print "Devesta = %s" % (desvesta)
 
+
 plt.plot(Valores)
+plt.xlabel("Procesos")
+plt.ylabel("Tiempo")
 plt.show()
