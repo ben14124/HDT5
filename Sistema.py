@@ -82,7 +82,7 @@ def proceso(name, env, memoria, instrucciones, veces, llegatoria):
 env = simpy.Environment() #se crea ambiente
 RAMdisponibles = simpy.Resource(env, capacity=1)
 InstruccionesDisponibles = simpy.Resource(env, capacity=1)
-RAM = simpy.Container(env, init=30, capacity=30)
+RAM = simpy.Container(env, init=100, capacity=100)
 
 global Valores
 Valores = []
@@ -90,11 +90,12 @@ RANDOM_SEED = 42
 random.seed(RANDOM_SEED)
 veces = 3
 TiempoTotal = 0.0
-intervalo = 5 #intervalo al que se realizara random de memoria
-cantprocesos = 200 #cantidad de procesos a realizar SO
+intervalo = 10 #intervalo al que se realizara random de memoria
+cantprocesos = 100 #cantidad de procesos a realizar SO
 genProcesos = env.process(generadorProcesos(env, cantprocesos, intervalo, veces)) #generan procesos
 env.run()
 
+#Variables para el calculo de la desviacion estandar
 promedio = TiempoTotal/cantprocesos
 desvesta = 0
 ValorCuadrado = 0
@@ -109,9 +110,9 @@ for x in range (cantprocesos):
     AdentroRaiz = ValoresCuadrados/cantprocesos
 
 desvesta = AdentroRaiz**0.5
-print "Devesta = %s" % (desvesta)
+print "Devesviacion estandar = %s" % (desvesta)
 
-
+#Graficamos los resultados obtenidos
 plt.plot(Valores)
 plt.xlabel("Procesos")
 plt.ylabel("Tiempo")
